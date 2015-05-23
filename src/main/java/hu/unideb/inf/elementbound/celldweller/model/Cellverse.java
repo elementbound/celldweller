@@ -13,7 +13,14 @@ public class Cellverse {
 	 * Used to identify cells. 
 	 */
 	public static class Point {
+		/**
+		 * x coordinate in space
+		 */
 		public int x;
+		
+		/**
+		 * y coordinate in space
+		 */
 		public int y;
 		
 		/**
@@ -105,7 +112,7 @@ public class Cellverse {
 	public void swapBuffers() {
 		Set<Point> tmp = frontBuffer;
 		frontBuffer = backBuffer;
-		frontBuffer = tmp;
+		backBuffer = tmp;
 		
 		backBuffer.clear();
 		backBuffer.addAll(frontBuffer);
