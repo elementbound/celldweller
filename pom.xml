@@ -5,6 +5,11 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>celldweller</name>
   <description>Cellular automata simulator in 2D space</description>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
   <dependencies>
   	<dependency>
   		<groupId>junit</groupId>
@@ -13,6 +18,7 @@
   		<scope>test</scope>
   	</dependency>
   </dependencies>
+  
   <reporting>
   	<plugins>
   		<plugin>
@@ -22,4 +28,36 @@
   		</plugin>
   	</plugins>
   </reporting>
+  
+  <build>
+  	<plugins>
+  		<plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-compiler-plugin</artifactId>
+  			<version>3.3</version>
+  			
+  			<configuration>
+	  			<source>1.7</source>
+	  			<target>1.7</target>
+  			</configuration>
+  		</plugin>
+  		
+  		<plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-jar-plugin</artifactId>
+  			<version>2.6</version>
+  			
+  			<configuration>
+				<archive>
+					<index>true</index>
+					<manifest>
+						<addClasspath>true</addClasspath>
+						<mainClass>hu.unideb.inf.elementbound.celldweller.view.EditableCellverseView</mainClass>
+					</manifest>
+				</archive>
+  			</configuration>
+  		</plugin>
+  	</plugins>
+  </build>
+  
 </project>

@@ -3,38 +3,22 @@ package hu.unideb.inf.elementbound.celldweller.view;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
-import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import java.awt.BorderLayout;
 
-import javax.swing.JToolBar;
-
-import java.awt.FlowLayout;
-
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-
 import javax.swing.JLabel;
-
-import java.awt.GridLayout;
-
-import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 
 import java.awt.GridBagLayout;
 
-import javax.swing.JRadioButton;
 import javax.swing.JButton;
 
 import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Canvas;
-import java.awt.CardLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
