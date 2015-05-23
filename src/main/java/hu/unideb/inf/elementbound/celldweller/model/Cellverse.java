@@ -15,19 +15,27 @@ public class Cellverse {
 	
 	private Set<Point>[] aliveCells;
 	
-	void setCell(Point cell, boolean value) {
+	public void setCell(Point cell, boolean value) {
 		;
 	}
 	
-	boolean getCell(Point cell) {
+	public boolean getCell(Point cell) {
 		return false;
 	}
 	
-	Set<Point> getAliveCells() {
+	public Set<Point> getAliveCells() {
 		return aliveCells[0];
 	}
 	
-	void swapBuffers() {
+	public void clear() {
+		;
+	}
+	
+	public boolean isEmpty() {
+		return true;
+	}
+	
+	public void swapBuffers() {
 		;
 	}
 }
