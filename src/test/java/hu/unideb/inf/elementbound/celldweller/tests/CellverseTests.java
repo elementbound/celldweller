@@ -12,4 +12,10 @@ public class CellverseTests {
 		Cellverse cellverse = new Cellverse();
 		assertTrue(cellverse.isEmpty());
 	}
+	
+	@Test
+	public void hashCodeTest() {
+		Cellverse.Point point = new Cellverse.Point(1, 1);
+		assertEquals(0x1_0001, point.hashCode());
+	}
 }

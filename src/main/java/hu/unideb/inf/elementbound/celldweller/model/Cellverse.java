@@ -1,5 +1,7 @@
 package hu.unideb.inf.elementbound.celldweller.model;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -23,9 +25,28 @@ public class Cellverse {
 			this.x = x;
 			this.y = y;
 		}
+		
+		@Override
+		public boolean equals(Object rhs) {
+			if(rhs == null) return false;
+			if(rhs == this) return true;
+			Point p = (Point)rhs;
+			return x == p.x && y == p.y;
+		}
+		
+		@Override
+		public int hashCode() {
+			return (x & 0xFFFF_FFFF) | ((y & 0xFFFF_FFFF) << 16);
+		}
 	}
 	
-	private Set<Point>[] aliveCells;
+	private Set<Point> frontBuffer;
+	private Set<Point> backBuffer;
+	
+	public Cellverse() {
+		frontBuffer = new HashSet<Point>();
+		backBuffer = new HashSet<Point>();
+	}
 	
 	/**
 	 * Set cell state
@@ -35,7 +56,12 @@ public class Cellverse {
 	 * @see #clear()
 	 */
 	public void setCell(Point cell, boolean value) {
-		;
+		if(value == true) {
+			if(!backBuffer.contains(cell))
+				backBuffer.add(cell);
+		}
+		else
+			backBuffer.remove(cell);
 	}
 	
 	/**
@@ -45,7 +71,7 @@ public class Cellverse {
 	 * @see #setCell(Point, boolean)
 	 */
 	public boolean getCell(Point cell) {
-		return false;
+		return frontBuffer.contains(cell);
 	}
 	
 	/**
@@ -53,7 +79,7 @@ public class Cellverse {
 	 * @return A set of alive cells
 	 */
 	public Set<Point> getAliveCells() {
-		return aliveCells[0];
+		return Collections.unmodifiableSet(frontBuffer);
 	}
 	
 	/**
@@ -61,7 +87,7 @@ public class Cellverse {
 	 * @see #isEmpty()
 	 */
 	public void clear() {
-		;
+		backBuffer.clear();
 	}
 	
 	/**
@@ -70,13 +96,18 @@ public class Cellverse {
 	 * @see #clear()
 	 */
 	public boolean isEmpty() {
-		return true;
+		return frontBuffer.isEmpty();
 	}
 	
 	/**
-	 * Swap front- and backbuffer. Used to mark the end of a simulation step. 
+	 * Swap front- and back buffers. Used to mark the end of a simulation step. 
 	 */
 	public void swapBuffers() {
-		;
+		Set<Point> tmp = frontBuffer;
+		frontBuffer = backBuffer;
+		frontBuffer = tmp;
+		
+		backBuffer.clear();
+		backBuffer.addAll(frontBuffer);
 	}
 }
