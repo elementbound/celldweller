@@ -43,7 +43,7 @@ public class Cellverse {
 		
 		@Override
 		public int hashCode() {
-			return (x & 0xFFFF_FFFF) | ((y & 0xFFFF_FFFF) << 16);
+			return (x & 0xFFFFFFFF) | ((y & 0xFFFFFFFF) << 16);
 		}
 	}
 	

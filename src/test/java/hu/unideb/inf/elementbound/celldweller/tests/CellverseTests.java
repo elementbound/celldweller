@@ -41,6 +41,6 @@ public class CellverseTests {
 	@Test
 	public void hashCodeTest() {
 		Cellverse.Point point = new Cellverse.Point(1, 1);
-		assertEquals(0x1_0001, point.hashCode());
+		assertEquals(0x10001, point.hashCode());
 	}
 }
