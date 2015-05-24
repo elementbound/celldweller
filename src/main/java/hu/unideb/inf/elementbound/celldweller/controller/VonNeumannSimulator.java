@@ -24,10 +24,7 @@ public class VonNeumannSimulator implements ISimulator {
 	public static final int BOTTOM_BIT	= 4;
 
 	@Override
-	public void setRule(BitSet rule) throws IllegalArgumentException {
-		if(rule.size() != 32)
-			throw new IllegalArgumentException("Rule size must be 32");
-		
+	public void setRule(BitSet rule) {
 		this.rule = rule;
 	}
 
