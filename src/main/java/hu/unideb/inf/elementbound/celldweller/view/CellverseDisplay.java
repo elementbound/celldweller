@@ -11,9 +11,9 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 
 public class CellverseDisplay extends Canvas {
-	private double originX = 0.0;
-	private double originY = 0.0;
-	private double zoom = 8.0;
+	public double originX = 0.0;
+	public double originY = 0.0;
+	public double zoom = 8.0;
 	
 	private Cellverse cellverse = null;
 
@@ -33,6 +33,7 @@ public class CellverseDisplay extends Canvas {
 		AffineTransform transform = (AffineTransform) backupTransform.clone();
 			transform.translate(dims.getWidth()/2.0, dims.getHeight()/2.0);
 			transform.scale(zoom, zoom);
+			transform.translate(-originX, -originY);
 			
 			
 		g2.setTransform(transform);

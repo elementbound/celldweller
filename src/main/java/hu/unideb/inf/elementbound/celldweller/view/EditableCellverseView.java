@@ -28,6 +28,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
 import java.util.BitSet;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class EditableCellverseView extends JFrame {
 	private JTextField textFieldRule;
@@ -99,6 +103,12 @@ public class EditableCellverseView extends JFrame {
 		rulePanel.add(lblRule);
 		
 		textFieldRule = new JTextField();
+		textFieldRule.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				simulator.setRule(BitSet.valueOf(textFieldRule.getText().getBytes()));
+			}
+		});
 		textFieldRule.setColumns(10);
 		rulePanel.add(textFieldRule);
 		
@@ -147,6 +157,48 @@ public class EditableCellverseView extends JFrame {
 		thingsPanel.add(lblPlaceholder);
 		
 		displayCanvas = new CellverseDisplay();
+		displayCanvas.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				switch(e.getKeyCode()) {
+					case KeyEvent.VK_LEFT: 
+						((CellverseDisplay)displayCanvas).originX -= 1.0;
+						((CellverseDisplay)displayCanvas).repaint();
+					break;
+
+					case KeyEvent.VK_RIGHT: 
+						((CellverseDisplay)displayCanvas).originX += 1.0;
+						((CellverseDisplay)displayCanvas).repaint();
+					break;
+
+					case KeyEvent.VK_DOWN: 
+						((CellverseDisplay)displayCanvas).originY += 1.0;
+						((CellverseDisplay)displayCanvas).repaint();
+					break;
+					
+					case KeyEvent.VK_UP: 
+						((CellverseDisplay)displayCanvas).originY -= 1.0;
+						((CellverseDisplay)displayCanvas).repaint();
+					break;
+					
+					case KeyEvent.VK_ADD: 
+						((CellverseDisplay)displayCanvas).zoom *= Math.pow(2.0, 1.0/8.0);
+						((CellverseDisplay)displayCanvas).repaint();
+					break;
+					
+					case KeyEvent.VK_SUBTRACT: 
+						((CellverseDisplay)displayCanvas).zoom /= Math.pow(2.0, 1.0/8.0);
+						((CellverseDisplay)displayCanvas).repaint();
+					break;
+					
+					case KeyEvent.VK_SPACE: 
+						simulator.step(cellverse);
+						cellverse.swapBuffers();
+						((CellverseDisplay)displayCanvas).repaint();
+					break;
+				}
+			}
+		});
 		displayCanvas.setForeground(Color.BLACK);
 		displayCanvas.setBackground(Color.WHITE);
 		displayPanel.add(displayCanvas, BorderLayout.CENTER);
