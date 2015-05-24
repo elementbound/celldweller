@@ -1,5 +1,6 @@
 package hu.unideb.inf.elementbound.celldweller.view;
 
+import hu.unideb.inf.elementbound.celldweller.controller.EditableCellverseController;
 import hu.unideb.inf.elementbound.celldweller.controller.ISimulator;
 import hu.unideb.inf.elementbound.celldweller.controller.VonNeumannSimulator;
 import hu.unideb.inf.elementbound.celldweller.model.CSVAdapter;
@@ -53,8 +54,8 @@ import javax.swing.DefaultComboBoxModel;
 public class EditableCellverseView extends JFrame {
 	private JTextField textFieldRule;
 	private Canvas displayCanvas;
-	private Cellverse cellverse;
-	private ISimulator simulator;
+	private JLabel lblStats;
+	private EditableCellverseController controller;
 
 	/**
 	 * Launch the application.
@@ -84,16 +85,6 @@ public class EditableCellverseView extends JFrame {
 	 * Create the frame.
 	 */
 	public EditableCellverseView() {
-		cellverse = new Cellverse();
-		cellverse.setCell(new Point(0,0), true);
-		cellverse.swapBuffers();
-		
-		simulator = new VonNeumannSimulator();
-		BitSet rule = new BitSet();
-		for(int i=0; i<32; i++)
-			rule.set(i);
-		simulator.setRule(rule);
-		
 		setTitle("Celldweller");
 		setBounds(100, 100, 800, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -126,7 +117,7 @@ public class EditableCellverseView extends JFrame {
 		textFieldRule.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				simulator.setRule(BitSet.valueOf(textFieldRule.getText().getBytes()));
+				controller.ruleChange(BitSet.valueOf(textFieldRule.getText().getBytes()));
 			}
 		});
 		textFieldRule.setColumns(10);
@@ -135,9 +126,7 @@ public class EditableCellverseView extends JFrame {
 		JButton btnStep = new JButton("Step");
 		btnStep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				simulator.step(cellverse);
-				cellverse.swapBuffers();
-				displayCanvas.repaint();
+				controller.singleStep();
 			}
 		});
 		
@@ -151,11 +140,10 @@ public class EditableCellverseView extends JFrame {
 		JButton btnClear = new JButton("Clear");
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				cellverse.clear();
-				cellverse.swapBuffers();
-				displayCanvas.repaint();
+				controller.clear();
 			}
 		});
+		
 		GridBagConstraints gbc_btnClear = new GridBagConstraints();
 		gbc_btnClear.fill = GridBagConstraints.BOTH;
 		gbc_btnClear.insets = new Insets(0, 0, 5, 0);
@@ -166,18 +154,7 @@ public class EditableCellverseView extends JFrame {
 		JButton btnSave = new JButton("Save");
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser jfc = new JFileChooser();
-				try {
-					int result = jfc.showSaveDialog((Component)e.getSource());
-					jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-					if(result == JFileChooser.APPROVE_OPTION) {
-						IOAdapter adapter = new CSVAdapter();
-						adapter.Write(jfc.getSelectedFile(), cellverse);
-					}
-				} 
-				catch (HeadlessException | IOException ex) {
-					ex.printStackTrace();
-				}
+				controller.saveToFile();
 			}
 		});
 		GridBagConstraints gbc_btnSave = new GridBagConstraints();
@@ -190,18 +167,7 @@ public class EditableCellverseView extends JFrame {
 		JButton btnLoad = new JButton("Load");
 		btnLoad.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser jfc = new JFileChooser();
-				try {
-					int result = jfc.showOpenDialog((Component)e.getSource());
-					if(result == JFileChooser.APPROVE_OPTION) {
-						IOAdapter adapter = new CSVAdapter();
-						adapter.Read(jfc.getSelectedFile(), cellverse);
-						displayCanvas.repaint();
-					}
-				} 
-				catch (HeadlessException | IOException ex) {
-					ex.printStackTrace();
-				}
+				controller.loadFromFile();
 			}
 		});
 		GridBagConstraints gbc_btnLoad = new GridBagConstraints();
@@ -237,7 +203,7 @@ public class EditableCellverseView extends JFrame {
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		displayPanel.add(thingsPanel, BorderLayout.SOUTH);
 		
-		JLabel lblStats = new JLabel("Things will possibly hapen here. ");
+		lblStats = new JLabel("Things will possibly hapen here. ");
 		lblStats.setVerticalAlignment(SwingConstants.TOP);
 		lblStats.setHorizontalAlignment(SwingConstants.LEFT);
 		thingsPanel.add(lblStats);
@@ -246,34 +212,11 @@ public class EditableCellverseView extends JFrame {
 		displayCanvas.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				CellverseDisplay d = (CellverseDisplay)displayCanvas;
-				
-				double cellX = (double)e.getX();
-				double cellY = (double)e.getY();
-				
-				cellX -= d.getWidth()/2;
-				cellY -= d.getHeight()/2;
-				
-				cellX /= d.zoom;
-				cellY /= d.zoom;
-				
-				cellX -= d.originX;
-				cellY -= d.originY;
-				
-				Point cell = new Point((int)cellX, (int)cellY);
-				
-				System.out.println("Mouse coords: " + e.getX() + "; " + e.getY());
-				System.out.println("Cell coords: " + cellX + "; " + cellY);
-				
 				if(e.getButton() == MouseEvent.BUTTON1)
-					cellverse.setCell(cell, true);
-				else if(e.getButton() == MouseEvent.BUTTON2)
-					cellverse.setCell(cell, false);
-				
-				cellverse.swapBuffers();
-				d.repaint();
+					controller.setCell(e.getX(), e.getY());
 			}
 		});
+		
 		displayCanvas.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -301,17 +244,17 @@ public class EditableCellverseView extends JFrame {
 					case KeyEvent.VK_ADD: 
 						((CellverseDisplay)displayCanvas).zoom *= Math.pow(2.0, 1.0/8.0);
 						((CellverseDisplay)displayCanvas).repaint();
+						notifyZoom();
 					break;
 					
 					case KeyEvent.VK_SUBTRACT: 
 						((CellverseDisplay)displayCanvas).zoom /= Math.pow(2.0, 1.0/8.0);
 						((CellverseDisplay)displayCanvas).repaint();
+						notifyZoom();
 					break;
 					
 					case KeyEvent.VK_SPACE: 
-						simulator.step(cellverse);
-						cellverse.swapBuffers();
-						((CellverseDisplay)displayCanvas).repaint();
+						controller.singleStep();
 					break;
 				}
 			}
@@ -320,6 +263,24 @@ public class EditableCellverseView extends JFrame {
 		displayCanvas.setBackground(Color.WHITE);
 		displayPanel.add(displayCanvas, BorderLayout.CENTER);
 		
-		((CellverseDisplay)displayCanvas).setCellverse(cellverse);
+		//
+
+		controller = new EditableCellverseController();
+		controller.init(displayCanvas, this);
+		
+		((CellverseDisplay)displayCanvas).setCellverse(controller.getCellverse());
+	}
+	
+	public void notifyCellcount() {
+		updateStats();
+	}
+	
+	public void notifyZoom() {
+		updateStats();
+	}
+	
+	public void updateStats() {
+		lblStats.setText("Cells alive: " + controller.getCellverse().getAliveCells().size() + " | " + 
+						 "Zoom: " + ((CellverseDisplay)displayCanvas).zoom);
 	}
 }

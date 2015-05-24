@@ -35,9 +35,7 @@ public class CellverseDisplay extends Canvas {
 			transform.scale(zoom, zoom);
 			transform.translate(-originX, -originY);
 			
-			
 		g2.setTransform(transform);
-		System.out.println("Drawing " + cellverse.getAliveCells().size() + " live cells");
 		g2.setColor(new Color(0));
 		for(Point cell : cellverse.getAliveCells()) 
 			g2.fillRect(cell.x, cell.y, 1, 1);
