@@ -2,11 +2,14 @@ package hu.unideb.inf.elementbound.celldweller.view;
 
 import hu.unideb.inf.elementbound.celldweller.controller.ISimulator;
 import hu.unideb.inf.elementbound.celldweller.controller.VonNeumannSimulator;
+import hu.unideb.inf.elementbound.celldweller.model.CSVAdapter;
 import hu.unideb.inf.elementbound.celldweller.model.Cellverse;
+import hu.unideb.inf.elementbound.celldweller.model.IOAdapter;
 import hu.unideb.inf.elementbound.celldweller.model.Cellverse.Point;
 
 import java.awt.EventQueue;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -22,6 +25,7 @@ import javax.swing.JButton;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
+import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.Canvas;
 import java.awt.event.ActionListener;
@@ -30,12 +34,17 @@ import java.awt.Color;
 import java.util.BitSet;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import java.io.IOException;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import javax.swing.SwingConstants;
+
 import java.awt.FlowLayout;
+
+import javax.swing.Box;
 
 public class EditableCellverseView extends JFrame {
 	private JTextField textFieldRule;
@@ -90,14 +99,16 @@ public class EditableCellverseView extends JFrame {
 		getContentPane().add(settingsPanel, BorderLayout.EAST);
 		GridBagLayout gbl_settingsPanel = new GridBagLayout();
 		gbl_settingsPanel.columnWidths = new int[]{129, 0};
-		gbl_settingsPanel.rowHeights = new int[] {32, 32, 32, 0};
+		gbl_settingsPanel.rowHeights = new int[] {32, 32, 32, 32, 32};
 		gbl_settingsPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
-		gbl_settingsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_settingsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
 		settingsPanel.setLayout(gbl_settingsPanel);
 		
 		JPanel rulePanel = new JPanel();
+		FlowLayout flowLayout_1 = (FlowLayout) rulePanel.getLayout();
 		GridBagConstraints gbc_rulePanel = new GridBagConstraints();
-		gbc_rulePanel.fill = GridBagConstraints.BOTH;
+		gbc_rulePanel.anchor = GridBagConstraints.NORTH;
+		gbc_rulePanel.fill = GridBagConstraints.HORIZONTAL;
 		gbc_rulePanel.insets = new Insets(0, 0, 5, 0);
 		gbc_rulePanel.gridx = 0;
 		gbc_rulePanel.gridy = 0;
@@ -126,6 +137,7 @@ public class EditableCellverseView extends JFrame {
 		});
 		
 		GridBagConstraints gbc_btnStep = new GridBagConstraints();
+		gbc_btnStep.insets = new Insets(0, 0, 5, 0);
 		gbc_btnStep.fill = GridBagConstraints.BOTH;
 		gbc_btnStep.gridx = 0;
 		gbc_btnStep.gridy = 1;
@@ -145,6 +157,52 @@ public class EditableCellverseView extends JFrame {
 		gbc_btnClear.gridx = 0;
 		gbc_btnClear.gridy = 2;
 		settingsPanel.add(btnClear, gbc_btnClear);
+		
+		JButton btnSave = new JButton("Save");
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser jfc = new JFileChooser();
+				try {
+					int result = jfc.showSaveDialog((Component)e.getSource());
+					if(result == JFileChooser.APPROVE_OPTION) {
+						IOAdapter adapter = new CSVAdapter();
+						adapter.Write(jfc.getSelectedFile(), cellverse);
+					}
+				} 
+				catch (HeadlessException | IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		GridBagConstraints gbc_btnSave = new GridBagConstraints();
+		gbc_btnSave.insets = new Insets(0, 0, 5, 0);
+		gbc_btnSave.fill = GridBagConstraints.BOTH;
+		gbc_btnSave.gridx = 0;
+		gbc_btnSave.gridy = 3;
+		settingsPanel.add(btnSave, gbc_btnSave);
+		
+		JButton btnLoad = new JButton("Load");
+		btnLoad.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser jfc = new JFileChooser();
+				try {
+					int result = jfc.showOpenDialog((Component)e.getSource());
+					if(result == JFileChooser.APPROVE_OPTION) {
+						IOAdapter adapter = new CSVAdapter();
+						adapter.Read(jfc.getSelectedFile(), cellverse);
+						displayCanvas.repaint();
+					}
+				} 
+				catch (HeadlessException | IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		GridBagConstraints gbc_btnLoad = new GridBagConstraints();
+		gbc_btnLoad.fill = GridBagConstraints.BOTH;
+		gbc_btnLoad.gridx = 0;
+		gbc_btnLoad.gridy = 4;
+		settingsPanel.add(btnLoad, gbc_btnLoad);
 		
 		JPanel displayPanel = new JPanel();
 		getContentPane().add(displayPanel, BorderLayout.CENTER);

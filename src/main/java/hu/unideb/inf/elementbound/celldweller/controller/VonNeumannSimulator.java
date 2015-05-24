@@ -7,6 +7,11 @@ import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Implements simulation based on von Neumann neighborhood, 
+ * which means using the top, left, bottom, right neighbors. 
+ * @author adminus
+ */
 public class VonNeumannSimulator implements ISimulator {
 	private BitSet rule;
 	private static Point[] offsets = {
