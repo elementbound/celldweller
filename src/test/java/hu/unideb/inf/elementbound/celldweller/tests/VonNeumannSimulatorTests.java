@@ -36,7 +36,7 @@ public class VonNeumannSimulatorTests {
 		VonNeumannSimulator sim = new VonNeumannSimulator();
 		Cellverse cellverse = new Cellverse();
 		
-		rule.set(1, true);
+		rule.set(VonNeumannSimulator.CENTER_RULE, true);
 		sim.setRule(rule);
 		
 		cellverse.setCell(new Point(0,0), true);

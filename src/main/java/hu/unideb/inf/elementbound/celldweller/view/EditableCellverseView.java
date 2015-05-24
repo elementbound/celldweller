@@ -1,5 +1,10 @@
 package hu.unideb.inf.elementbound.celldweller.view;
 
+import hu.unideb.inf.elementbound.celldweller.controller.ISimulator;
+import hu.unideb.inf.elementbound.celldweller.controller.VonNeumannSimulator;
+import hu.unideb.inf.elementbound.celldweller.model.Cellverse;
+import hu.unideb.inf.elementbound.celldweller.model.Cellverse.Point;
+
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -21,10 +26,14 @@ import java.awt.Insets;
 import java.awt.Canvas;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Color;
+import java.util.BitSet;
 
 public class EditableCellverseView extends JFrame {
 	private JTextField textFieldRule;
 	private Canvas displayCanvas;
+	private Cellverse cellverse;
+	private ISimulator simulator;
 
 	/**
 	 * Launch the application.
@@ -54,6 +63,16 @@ public class EditableCellverseView extends JFrame {
 	 * Create the frame.
 	 */
 	public EditableCellverseView() {
+		cellverse = new Cellverse();
+		cellverse.setCell(new Point(0,0), true);
+		cellverse.swapBuffers();
+		
+		simulator = new VonNeumannSimulator();
+		BitSet rule = new BitSet();
+		for(int i=0; i<32; i++)
+			rule.set(i);
+		simulator.setRule(rule);
+		
 		setTitle("Celldweller");
 		setBounds(100, 100, 800, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -86,11 +105,13 @@ public class EditableCellverseView extends JFrame {
 		JButton btnStep = new JButton("Step");
 		btnStep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Component component = (Component)arg0.getSource();
+				/*Component component = (Component)arg0.getSource();
 				EditableCellverseView root = (EditableCellverseView)SwingUtilities.getRoot(component);
 				CellverseDisplay display = (CellverseDisplay)root.getDisplayCanvas();
-				display.advanceText();
-				display.repaint();
+				display.repaint();*/
+				simulator.step(cellverse);
+				cellverse.swapBuffers();
+				displayCanvas.repaint();
 			}
 		});
 		
@@ -101,6 +122,13 @@ public class EditableCellverseView extends JFrame {
 		settingsPanel.add(btnStep, gbc_btnStep);
 		
 		JButton btnClear = new JButton("Clear");
+		btnClear.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				cellverse.clear();
+				cellverse.swapBuffers();
+				displayCanvas.repaint();
+			}
+		});
 		GridBagConstraints gbc_btnClear = new GridBagConstraints();
 		gbc_btnClear.fill = GridBagConstraints.BOTH;
 		gbc_btnClear.insets = new Insets(0, 0, 5, 0);
@@ -119,6 +147,10 @@ public class EditableCellverseView extends JFrame {
 		thingsPanel.add(lblPlaceholder);
 		
 		displayCanvas = new CellverseDisplay();
+		displayCanvas.setForeground(Color.BLACK);
+		displayCanvas.setBackground(Color.WHITE);
 		displayPanel.add(displayCanvas, BorderLayout.CENTER);
+		
+		((CellverseDisplay)displayCanvas).setCellverse(cellverse);
 	}
 }

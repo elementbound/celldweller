@@ -22,6 +22,12 @@ public class VonNeumannSimulator implements ISimulator {
 	public static final int RIGHT_BIT 	= 2;
 	public static final int TOP_BIT 	= 3;
 	public static final int BOTTOM_BIT	= 4;
+	
+	public static final int CENTER_RULE	= 1;
+	public static final int LEFT_RULE	= 2;
+	public static final int RIGHT_RULE 	= 4;
+	public static final int TOP_RULE 	= 8;
+	public static final int BOTTOM_RULE	= 16;
 
 	@Override
 	public void setRule(BitSet rule) {
@@ -55,6 +61,4 @@ public class VonNeumannSimulator implements ISimulator {
 			cellverse.setCell(cell, rule.get(bitIndex));
 		}
 	}
-	
-	
 }
