@@ -34,6 +34,7 @@ import java.awt.Color;
 import java.util.BitSet;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import java.io.File;
 import java.io.IOException;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -45,6 +46,9 @@ import javax.swing.SwingConstants;
 import java.awt.FlowLayout;
 
 import javax.swing.Box;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
 
 public class EditableCellverseView extends JFrame {
 	private JTextField textFieldRule;
@@ -99,16 +103,17 @@ public class EditableCellverseView extends JFrame {
 		getContentPane().add(settingsPanel, BorderLayout.EAST);
 		GridBagLayout gbl_settingsPanel = new GridBagLayout();
 		gbl_settingsPanel.columnWidths = new int[]{129, 0};
-		gbl_settingsPanel.rowHeights = new int[] {32, 32, 32, 32, 32};
-		gbl_settingsPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
-		gbl_settingsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
+		gbl_settingsPanel.rowHeights = new int[] {32, 32, 32, 32, 32, 0, 0, 0};
+		gbl_settingsPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+		gbl_settingsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
 		settingsPanel.setLayout(gbl_settingsPanel);
 		
 		JPanel rulePanel = new JPanel();
 		FlowLayout flowLayout_1 = (FlowLayout) rulePanel.getLayout();
+		flowLayout_1.setAlignment(FlowLayout.LEFT);
 		GridBagConstraints gbc_rulePanel = new GridBagConstraints();
-		gbc_rulePanel.anchor = GridBagConstraints.NORTH;
-		gbc_rulePanel.fill = GridBagConstraints.HORIZONTAL;
+		gbc_rulePanel.fill = GridBagConstraints.BOTH;
+		gbc_rulePanel.anchor = GridBagConstraints.EAST;
 		gbc_rulePanel.insets = new Insets(0, 0, 5, 0);
 		gbc_rulePanel.gridx = 0;
 		gbc_rulePanel.gridy = 0;
@@ -164,6 +169,7 @@ public class EditableCellverseView extends JFrame {
 				JFileChooser jfc = new JFileChooser();
 				try {
 					int result = jfc.showSaveDialog((Component)e.getSource());
+					jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 					if(result == JFileChooser.APPROVE_OPTION) {
 						IOAdapter adapter = new CSVAdapter();
 						adapter.Write(jfc.getSelectedFile(), cellverse);
@@ -199,10 +205,28 @@ public class EditableCellverseView extends JFrame {
 			}
 		});
 		GridBagConstraints gbc_btnLoad = new GridBagConstraints();
+		gbc_btnLoad.insets = new Insets(0, 0, 5, 0);
 		gbc_btnLoad.fill = GridBagConstraints.BOTH;
 		gbc_btnLoad.gridx = 0;
 		gbc_btnLoad.gridy = 4;
 		settingsPanel.add(btnLoad, gbc_btnLoad);
+		
+		JLabel lblFileFormat = new JLabel("File Format: ");
+		GridBagConstraints gbc_lblFileFormat = new GridBagConstraints();
+		gbc_lblFileFormat.anchor = GridBagConstraints.WEST;
+		gbc_lblFileFormat.insets = new Insets(0, 0, 5, 0);
+		gbc_lblFileFormat.gridx = 0;
+		gbc_lblFileFormat.gridy = 5;
+		settingsPanel.add(lblFileFormat, gbc_lblFileFormat);
+		
+		JComboBox cboxFileFormat = new JComboBox();
+		cboxFileFormat.setModel(new DefaultComboBoxModel(new String[] {"Comma Separated Values (CSV)", "Extensible Markup Language (XML)"}));
+		GridBagConstraints gbc_cboxFileFormat = new GridBagConstraints();
+		gbc_cboxFileFormat.insets = new Insets(0, 0, 5, 0);
+		gbc_cboxFileFormat.fill = GridBagConstraints.HORIZONTAL;
+		gbc_cboxFileFormat.gridx = 0;
+		gbc_cboxFileFormat.gridy = 6;
+		settingsPanel.add(cboxFileFormat, gbc_cboxFileFormat);
 		
 		JPanel displayPanel = new JPanel();
 		getContentPane().add(displayPanel, BorderLayout.CENTER);
