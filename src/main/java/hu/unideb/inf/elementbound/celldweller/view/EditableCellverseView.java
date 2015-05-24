@@ -32,6 +32,10 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.SwingConstants;
+import java.awt.FlowLayout;
 
 public class EditableCellverseView extends JFrame {
 	private JTextField textFieldRule;
@@ -115,10 +119,6 @@ public class EditableCellverseView extends JFrame {
 		JButton btnStep = new JButton("Step");
 		btnStep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				/*Component component = (Component)arg0.getSource();
-				EditableCellverseView root = (EditableCellverseView)SwingUtilities.getRoot(component);
-				CellverseDisplay display = (CellverseDisplay)root.getDisplayCanvas();
-				display.repaint();*/
 				simulator.step(cellverse);
 				cellverse.swapBuffers();
 				displayCanvas.repaint();
@@ -151,12 +151,47 @@ public class EditableCellverseView extends JFrame {
 		displayPanel.setLayout(new BorderLayout(0, 0));
 		
 		JPanel thingsPanel = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) thingsPanel.getLayout();
+		flowLayout.setAlignment(FlowLayout.LEFT);
 		displayPanel.add(thingsPanel, BorderLayout.SOUTH);
 		
-		JLabel lblPlaceholder = new JLabel("Things will possibly hapen here. ");
-		thingsPanel.add(lblPlaceholder);
+		JLabel lblStats = new JLabel("Things will possibly hapen here. ");
+		lblStats.setVerticalAlignment(SwingConstants.TOP);
+		lblStats.setHorizontalAlignment(SwingConstants.LEFT);
+		thingsPanel.add(lblStats);
 		
 		displayCanvas = new CellverseDisplay();
+		displayCanvas.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				CellverseDisplay d = (CellverseDisplay)displayCanvas;
+				
+				double cellX = (double)e.getX();
+				double cellY = (double)e.getY();
+				
+				cellX -= d.getWidth()/2;
+				cellY -= d.getHeight()/2;
+				
+				cellX /= d.zoom;
+				cellY /= d.zoom;
+				
+				cellX -= d.originX;
+				cellY -= d.originY;
+				
+				Point cell = new Point((int)cellX, (int)cellY);
+				
+				System.out.println("Mouse coords: " + e.getX() + "; " + e.getY());
+				System.out.println("Cell coords: " + cellX + "; " + cellY);
+				
+				if(e.getButton() == MouseEvent.BUTTON1)
+					cellverse.setCell(cell, true);
+				else if(e.getButton() == MouseEvent.BUTTON2)
+					cellverse.setCell(cell, false);
+				
+				cellverse.swapBuffers();
+				d.repaint();
+			}
+		});
 		displayCanvas.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
