@@ -13,6 +13,7 @@ import java.awt.EventQueue;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -97,9 +98,9 @@ public class EditableCellverseView extends JFrame implements IEditableCellverseL
 		getContentPane().add(settingsPanel, BorderLayout.EAST);
 		GridBagLayout gbl_settingsPanel = new GridBagLayout();
 		gbl_settingsPanel.columnWidths = new int[]{129, 0};
-		gbl_settingsPanel.rowHeights = new int[] {32, 32, 32, 32, 32, 0, 0, 0, 0};
+		gbl_settingsPanel.rowHeights = new int[] {32, 32, 0, 8, 32, 32, 0};
 		gbl_settingsPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_settingsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
+		gbl_settingsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
 		settingsPanel.setLayout(gbl_settingsPanel);
 		
 		JPanel rulePanel = new JPanel();
@@ -148,6 +149,13 @@ public class EditableCellverseView extends JFrame implements IEditableCellverseL
 		gbc_btnStep.gridy = 1;
 		settingsPanel.add(btnStep, gbc_btnStep);
 		
+		JButton btnSave = new JButton("Save");
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				controller.saveToFile();
+			}
+		});
+		
 		JButton btnClear = new JButton("Clear");
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -162,17 +170,18 @@ public class EditableCellverseView extends JFrame implements IEditableCellverseL
 		gbc_btnClear.gridy = 2;
 		settingsPanel.add(btnClear, gbc_btnClear);
 		
-		JButton btnSave = new JButton("Save");
-		btnSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				controller.saveToFile();
-			}
-		});
+		JSeparator separator = new JSeparator();
+		GridBagConstraints gbc_separator = new GridBagConstraints();
+		gbc_separator.fill = GridBagConstraints.HORIZONTAL;
+		gbc_separator.insets = new Insets(0, 0, 5, 0);
+		gbc_separator.gridx = 0;
+		gbc_separator.gridy = 3;
+		settingsPanel.add(separator, gbc_separator);
 		GridBagConstraints gbc_btnSave = new GridBagConstraints();
 		gbc_btnSave.insets = new Insets(0, 0, 5, 0);
 		gbc_btnSave.fill = GridBagConstraints.BOTH;
 		gbc_btnSave.gridx = 0;
-		gbc_btnSave.gridy = 3;
+		gbc_btnSave.gridy = 4;
 		settingsPanel.add(btnSave, gbc_btnSave);
 		
 		JButton btnLoad = new JButton("Load");
@@ -185,29 +194,8 @@ public class EditableCellverseView extends JFrame implements IEditableCellverseL
 		gbc_btnLoad.insets = new Insets(0, 0, 5, 0);
 		gbc_btnLoad.fill = GridBagConstraints.BOTH;
 		gbc_btnLoad.gridx = 0;
-		gbc_btnLoad.gridy = 4;
+		gbc_btnLoad.gridy = 5;
 		settingsPanel.add(btnLoad, gbc_btnLoad);
-		
-		JLabel lblFileFormat = new JLabel("File Format: ");
-		GridBagConstraints gbc_lblFileFormat = new GridBagConstraints();
-		gbc_lblFileFormat.anchor = GridBagConstraints.WEST;
-		gbc_lblFileFormat.insets = new Insets(0, 0, 5, 0);
-		gbc_lblFileFormat.gridx = 0;
-		gbc_lblFileFormat.gridy = 5;
-		settingsPanel.add(lblFileFormat, gbc_lblFileFormat);
-		
-		JComboBox cboxFileFormat = new JComboBox();
-		cboxFileFormat.setModel(new DefaultComboBoxModel(
-				new String[] {
-						"Comma Separated Values (CSV)" 
-						//"Extensible Markup Language (XML)"
-				}));
-		GridBagConstraints gbc_cboxFileFormat = new GridBagConstraints();
-		gbc_cboxFileFormat.insets = new Insets(0, 0, 5, 0);
-		gbc_cboxFileFormat.fill = GridBagConstraints.HORIZONTAL;
-		gbc_cboxFileFormat.gridx = 0;
-		gbc_cboxFileFormat.gridy = 6;
-		settingsPanel.add(cboxFileFormat, gbc_cboxFileFormat);
 		
 		JPanel displayPanel = new JPanel();
 		getContentPane().add(displayPanel, BorderLayout.CENTER);
@@ -218,7 +206,7 @@ public class EditableCellverseView extends JFrame implements IEditableCellverseL
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		displayPanel.add(thingsPanel, BorderLayout.SOUTH);
 		
-		lblStats = new JLabel("Things will possibly hapen here. ");
+		lblStats = new JLabel("Things will possibly happen here. ");
 		lblStats.setVerticalAlignment(SwingConstants.TOP);
 		lblStats.setHorizontalAlignment(SwingConstants.LEFT);
 		thingsPanel.add(lblStats);
@@ -320,11 +308,12 @@ public class EditableCellverseView extends JFrame implements IEditableCellverseL
 	}
 
 	@Override
-	public File requestSaveFile(FileFilter filter) {
+	public File requestSaveFile(FileFilter... filters) {
 		JFileChooser jfc = new JFileChooser();
 		try {
 			jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			jfc.setFileFilter(filter);
+			for(FileFilter filter : filters)
+				jfc.setFileFilter(filter);
 			int result = jfc.showSaveDialog(this);
 			
 			if(result == JFileChooser.APPROVE_OPTION)
@@ -338,11 +327,12 @@ public class EditableCellverseView extends JFrame implements IEditableCellverseL
 	}
 
 	@Override
-	public File requestOpenFile(FileFilter filter) {
+	public File requestOpenFile(FileFilter... filters) {
 		JFileChooser jfc = new JFileChooser();
 		try {
 			jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			jfc.setFileFilter(filter);
+			for(FileFilter filter : filters)
+				jfc.setFileFilter(filter);
 			int result = jfc.showOpenDialog(this);
 			
 			if(result == JFileChooser.APPROVE_OPTION)
@@ -358,6 +348,11 @@ public class EditableCellverseView extends JFrame implements IEditableCellverseL
 	@Override
 	public void requestRuleUpdate(BitSet rule) {
 		textFieldRule.setText(new String(rule.toByteArray()));
+	}
+
+	@Override
+	public void showError(String msg) {
+		JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 	
 	

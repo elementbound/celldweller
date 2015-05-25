@@ -1,7 +1,6 @@
 package hu.unideb.inf.elementbound.celldweller.controller;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.BitSet;
 import java.util.Random;
 
@@ -10,11 +9,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-import hu.unideb.inf.elementbound.celldweller.model.CSVAdapter;
 import hu.unideb.inf.elementbound.celldweller.model.Cellverse;
 import hu.unideb.inf.elementbound.celldweller.model.Cellverse.Point;
 import hu.unideb.inf.elementbound.celldweller.model.IOAdapter;
 import hu.unideb.inf.elementbound.celldweller.model.XMLAdapter;
+import hu.unideb.inf.elementbound.celldweller.model.CSVAdapter;
 import hu.unideb.inf.elementbound.celldweller.view.EditableCellverseView;
 
 /**
@@ -164,21 +163,40 @@ public class EditableCellverseController {
 	public void saveToFile() {
 		logger.info("Saving to file");
 		logger.info("Prompting user");
+
+		FileNameExtensionFilter filterCSV = new FileNameExtensionFilter("Comma separated values (CSV)", "csv");
+		FileNameExtensionFilter filterXML = new FileNameExtensionFilter("Extensible markup language (XML)", "xml");
+		File fout = view.requestSaveFile(filterCSV, filterXML);
+		IOAdapter adapter = determineAdapter(fout);
 		
-		//FileNameExtensionFilter filter = new FileNameExtensionFilter("Comma separated values (CSV)", "csv");
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("xml", "xml");
-		File fout = view.requestSaveFile(filter);
-		if(fout != null) {
-			logger.info("Saving to " + fout.toString());
-			IOAdapter adapter = new XMLAdapter();
-			try {
-				adapter.Write(fout, cellverse);
-			} catch (Exception e) {
-				logger.error("Failed save", e);
-			}
+		if(adapter == null) {
+			view.showError("Wrong file type!");
+			return ;
+		}
+		
+		if(fout == null) 
+			return ;
+		
+		logger.info("Saving to " + fout.toString());
+		try {
+			adapter.Write(fout, cellverse);
+		} catch (Exception e) {
+			logger.error("Failed save", e);
 		}
 	}
 	
+	private IOAdapter determineAdapter(File file) {
+		String name = file.getName();
+		
+		if(name.endsWith(".xml"))
+			return new XMLAdapter();
+		
+		if(name.endsWith(".csv"))
+			return new CSVAdapter();
+		
+		return null;
+	}
+
 	/**
 	 * Load cellverse from a file. 
 	 * File path and format is determined using the view's functions. 
@@ -187,18 +205,25 @@ public class EditableCellverseController {
 		logger.info("Loading from file");
 		logger.info("Prompting user");
 
-		//FileNameExtensionFilter filter = new FileNameExtensionFilter("Comma separated values (CSV)", "csv");
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("xml", "xml");
-		File fin= view.requestOpenFile(filter);
-		if(fin != null) {
-			logger.info("Loading from " + fin.toString());
-			IOAdapter adapter = new XMLAdapter();
-			try {
-				adapter.Read(fin, cellverse);
-				view.cellverseUpdate();
-			} catch (Exception e) {
-				logger.error("Failed load", e);
-			}
+		FileNameExtensionFilter filterCSV = new FileNameExtensionFilter("Comma separated values (CSV)", "csv");
+		FileNameExtensionFilter filterXML = new FileNameExtensionFilter("Extensible markup language (XML)", "xml");
+		File fin = view.requestOpenFile(filterCSV, filterXML);
+		IOAdapter adapter = determineAdapter(fin);
+		
+		if(adapter == null) {
+			view.showError("Wrong file type!");
+			return ;
+		}
+		
+		if(fin == null) 
+			return ;
+		
+		logger.info("Loading from " + fin.toString());
+		try {
+			adapter.Read(fin, cellverse);
+			view.cellverseUpdate();
+		} catch (Exception e) {
+			logger.error("Failed load", e);
 		}
 	}
 	

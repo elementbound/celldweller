@@ -20,18 +20,24 @@ public interface IEditableCellverseListener {
 	 * @param filter to filter files
 	 * @return Return a valid file, or null on error or user interruption
 	 */
-	public File requestSaveFile(FileFilter filter);
+	public File requestSaveFile(FileFilter... filters);
 
 	/**
 	 * The controller requests a File to load data from. 
 	 * @param filter to filter files
 	 * @return Return a valid file, or null on error or user interruption
 	 */
-	public File requestOpenFile(FileFilter filter);
+	public File requestOpenFile(FileFilter... filters);
 	
 	/**
 	 * The controller has changed the simulator's rule and requests the view to update its display. 
 	 * @param rule The new rule
 	 */
 	public void requestRuleUpdate(BitSet rule);
+	
+	/**
+	 * The controller encountered an error and requests the view to display it
+	 * @param msg Error message
+	 */
+	public void showError(String msg);
 }

@@ -14,18 +14,24 @@ public class DummyEditableCellverseListener implements
 	}
 
 	@Override
-	public File requestSaveFile(FileFilter filter) {
+	public File requestSaveFile(FileFilter... filters) {
 		return null;
 	}
 
 	@Override
-	public File requestOpenFile(FileFilter filter) {
+	public File requestOpenFile(FileFilter... filters) {
 		return null;
 	}
 
 	@Override
 	public void requestRuleUpdate(BitSet rule) {
 		return ;
+	}
+
+	@Override
+	public void showError(String msg) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
