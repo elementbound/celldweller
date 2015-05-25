@@ -36,7 +36,7 @@ public interface IEditableCellverseListener {
 	public void requestRuleUpdate(BitSet rule);
 	
 	/**
-	 * The controller encountered an error and requests the view to display it
+	 * The controller encountered an error and requests the view to display it. 
 	 * @param msg Error message
 	 */
 	public void showError(String msg);

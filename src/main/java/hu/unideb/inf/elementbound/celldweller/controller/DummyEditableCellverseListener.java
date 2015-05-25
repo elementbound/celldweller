@@ -5,6 +5,11 @@ import java.util.BitSet;
 
 import javax.swing.filechooser.FileFilter;
 
+/**
+ * A dummy implementation of IEditableCellverseListener, for testing purposes. 
+ * Doesn't do much. 
+ * @author elementbound
+ */
 public class DummyEditableCellverseListener implements
 		IEditableCellverseListener {
 
