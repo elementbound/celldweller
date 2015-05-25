@@ -8,7 +8,19 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
+/**
+ * Class for saving and loading cellverse states from/to CSV files. 
+ * The file contains each living cell: <br>
+ * x1, y1, x2, y2, ...
+ * @author elementbound
+ */
 public class CSVAdapter implements IOAdapter {
+	/**
+	 * Read next CSV value. 
+	 * @param reader Source
+	 * @return CSV value read, as String
+	 * @throws IOException if an error occurs
+	 */
 	private String readCSVValue(BufferedReader reader) throws IOException {
 		StringBuilder strb = new StringBuilder();
 		
@@ -18,6 +30,12 @@ public class CSVAdapter implements IOAdapter {
 		return strb.toString();
 	}
 	
+	/**
+	 * Save cellverse state to CSV.
+	 * @param fout Output file
+	 * @param cellverse Cellverse
+	 * @throws IOException if an error occurs
+	 */
 	@Override
 	public void Write(File fout, Cellverse cellverse) throws IOException {
 		BufferedWriter writer = Files.newBufferedWriter(fout.toPath());
@@ -32,6 +50,14 @@ public class CSVAdapter implements IOAdapter {
 		writer.close();
 	}
 
+	/**
+	 * Load cellverse state from CSV. 
+	 * 
+	 * After load, the cellverse is in a usable state, no need to swapBuffers(). 
+	 * @param fin Input file
+	 * @param cellverse Cellverse
+	 * @throws IOException if an error occurs
+	 */
 	@Override
 	public void Read(File fin, Cellverse cellverse) throws IOException {
 		BufferedReader reader = Files.newBufferedReader(fin.toPath());
