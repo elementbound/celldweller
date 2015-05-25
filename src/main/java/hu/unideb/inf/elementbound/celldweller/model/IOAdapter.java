@@ -1,7 +1,6 @@
 package hu.unideb.inf.elementbound.celldweller.model;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Interface for IOAdapters.
@@ -14,9 +13,9 @@ public interface IOAdapter {
 	 * Save cellverse state to file.
 	 * @param fout Output file
 	 * @param cellverse Cellverse
-	 * @throws IOException if an error occurs
+	 * @throws Exception if an error occurs
 	 */
-	public void Write(File fout, Cellverse cellverse) throws IOException;
+	public void Write(File fout, Cellverse cellverse) throws Exception;
 	
 	/**
 	 * Load cellverse state from file. 
@@ -24,7 +23,7 @@ public interface IOAdapter {
 	 * After load, the cellverse is in a usable state, no need to swapBuffers(). 
 	 * @param fin Input file
 	 * @param cellverse Cellverse
-	 * @throws IOException if an error occurs
+	 * @throws Exception if an error occurs
 	 */
-	public void Read(File fin, Cellverse cellverse) throws IOException;
+	public void Read(File fin, Cellverse cellverse) throws Exception;
 }

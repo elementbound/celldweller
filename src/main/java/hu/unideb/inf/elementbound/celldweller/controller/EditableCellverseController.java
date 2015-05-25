@@ -14,6 +14,7 @@ import hu.unideb.inf.elementbound.celldweller.model.CSVAdapter;
 import hu.unideb.inf.elementbound.celldweller.model.Cellverse;
 import hu.unideb.inf.elementbound.celldweller.model.Cellverse.Point;
 import hu.unideb.inf.elementbound.celldweller.model.IOAdapter;
+import hu.unideb.inf.elementbound.celldweller.model.XMLAdapter;
 import hu.unideb.inf.elementbound.celldweller.view.EditableCellverseView;
 
 /**
@@ -164,14 +165,15 @@ public class EditableCellverseController {
 		logger.info("Saving to file");
 		logger.info("Prompting user");
 		
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("Comma separated values (CSV)", "csv");
+		//FileNameExtensionFilter filter = new FileNameExtensionFilter("Comma separated values (CSV)", "csv");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("xml", "xml");
 		File fout = view.requestSaveFile(filter);
 		if(fout != null) {
 			logger.info("Saving to " + fout.toString());
-			IOAdapter adapter = new CSVAdapter();
+			IOAdapter adapter = new XMLAdapter();
 			try {
 				adapter.Write(fout, cellverse);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				logger.error("Failed save", e);
 			}
 		}
@@ -184,16 +186,17 @@ public class EditableCellverseController {
 	public void loadFromFile() {
 		logger.info("Loading from file");
 		logger.info("Prompting user");
-		
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("Comma separated values (CSV)", "csv");
+
+		//FileNameExtensionFilter filter = new FileNameExtensionFilter("Comma separated values (CSV)", "csv");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("xml", "xml");
 		File fin= view.requestOpenFile(filter);
 		if(fin != null) {
 			logger.info("Loading from " + fin.toString());
-			IOAdapter adapter = new CSVAdapter();
+			IOAdapter adapter = new XMLAdapter();
 			try {
 				adapter.Read(fin, cellverse);
 				view.cellverseUpdate();
-			} catch (IOException e) {
+			} catch (Exception e) {
 				logger.error("Failed load", e);
 			}
 		}
