@@ -33,7 +33,15 @@ import java.util.Set;
  * @author adminus
  */
 public class VonNeumannSimulator implements ISimulator {
+	/**
+	 * Rule stored internally. 
+	 */
 	private BitSet rule;
+	
+	/**
+	 * An array of neighboring cells to consider during simulation. 
+	 * These offsets are always relative to the currently simulated cell. 
+	 */
 	private static Point[] offsets = {
 		new Point( 0,  0), 
 		new Point(-1,  0), 
@@ -42,16 +50,64 @@ public class VonNeumannSimulator implements ISimulator {
 		new Point( 0, +1)
 	};
 
+	/**
+	 * Bit ID for center rule - That is, set the bit when the cell is alive. 
+	 */
 	public static final int CENTER_BIT	= 0;
+
+	/**
+	 * Bit ID for left rule - That is, set the bit when left neighbor is alive.  
+	 */
 	public static final int LEFT_BIT	= 1;
+
+	/**
+	 * Bit ID for right rule - That is, set the bit when right neighbor is alive.  
+	 */
 	public static final int RIGHT_BIT 	= 2;
+
+	/**
+	 * Bit ID for top rule - That is, set the bit when top neighbor is alive.  
+	 */
 	public static final int TOP_BIT 	= 3;
+
+	/**
+	 * Bit ID for bottom rule - That is, set the bit when bottom neighbor is alive.  
+	 */
 	public static final int BOTTOM_BIT	= 4;
 	
+	/**
+	 * Bit mask for center rule. 
+	 * These can be bitwise OR'd together, e.g. {@code CENTER_RULE | LEFT_RULE} to produce an 
+	 * index into the rule BitSet.
+	 */
 	public static final int CENTER_RULE	= 1;
+	
+	/**
+	 * Bit mask for left rule. 
+	 * These can be bitwise OR'd together, e.g. {@code CENTER_RULE | LEFT_RULE} to produce an 
+	 * index into the rule BitSet.
+	 */
 	public static final int LEFT_RULE	= 2;
+	
+	/**
+	 * Bit mask for right rule. 
+	 * These can be bitwise OR'd together, e.g. {@code CENTER_RULE | LEFT_RULE} to produce an 
+	 * index into the rule BitSet.
+	 */
 	public static final int RIGHT_RULE 	= 4;
+	
+	/**
+	 * Bit mask for top rule. 
+	 * These can be bitwise OR'd together, e.g. {@code CENTER_RULE | LEFT_RULE} to produce an 
+	 * index into the rule BitSet.
+	 */
 	public static final int TOP_RULE 	= 8;
+	
+	/**
+	 * Bit mask for bottom rule. 
+	 * These can be bitwise OR'd together, e.g. {@code CENTER_RULE | LEFT_RULE} to produce an 
+	 * index into the rule BitSet.
+	 */
 	public static final int BOTTOM_RULE	= 16;
 	
 	/**
