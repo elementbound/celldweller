@@ -15,21 +15,21 @@ import java.util.BitSet;
  */
 public interface ISimulator {
 	/**
-	 * Setter for rule
+	 * Setter for rule. 
 	 * @param rule Bitset of rules
 	 */
 	public void setRule(BitSet rule);
 	
 	/**
-	 * Getter for rule
+	 * Getter for rule. 
 	 * @return Bitset of rules
 	 */
 	public BitSet getRule();
 	
 	/**
 	 * Perform a simulation step. 
-	 * **Do note that you still have to call Cellverse.swapBuffers() manually**
-	 * @param cellverse
+	 * <b>Do note that you still have to call Cellverse.swapBuffers() manually</b>
+	 * @param cellverse Cellverse to modify
 	 */
 	public void step(Cellverse cellverse);
 }
