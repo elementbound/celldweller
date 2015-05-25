@@ -10,7 +10,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -63,7 +62,6 @@ public class XMLAdapter implements IOAdapter {
 	@Override
 	public void Read(File fin, Cellverse cellverse) throws IOException, SAXException, ParserConfigurationException {
 		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(fin);
-		System.out.println("Root: " + doc.getDocumentElement().getNodeName());
 		
 		cellverse.clear();
 		

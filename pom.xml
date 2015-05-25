@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>hu.unideb.inf</groupId>
 	<artifactId>celldweller</artifactId>
-	<version>0.2</version>
+	<version>0.3</version>
 	<name>celldweller</name>
 	<description>Cellular automata simulator in 2D space</description>
 	<developers>
@@ -158,29 +158,6 @@
 				<artifactId>maven-site-plugin</artifactId>
 				<version>3.4</version>
 			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-				<version>2.7</version>
-				<configuration>
-					<instrumentation>
-						<ignores>
-							<ignore>com.example.boringcode.*</ignore>
-						</ignores>
-						<excludes>
-							<exclude>hu/unideb/inf/elementbound/celldweller/view/**/*.class</exclude>
-						</excludes>
-					</instrumentation>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 
 		<pluginManagement>
@@ -248,13 +225,7 @@
 					<configLocation>checkstyle.xml</configLocation>
 				</configuration>
 			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-				<version>2.7</version>
-			</plugin>
-
+			
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>

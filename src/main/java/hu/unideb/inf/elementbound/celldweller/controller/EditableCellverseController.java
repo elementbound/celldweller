@@ -185,6 +185,11 @@ public class EditableCellverseController {
 		}
 	}
 	
+	/**
+	 * Determine which IOAdapter to use based on file name. 
+	 * @param file File to check. 
+	 * @return An instance of a class implementing IOAdapter. 
+	 */
 	private IOAdapter determineAdapter(File file) {
 		String name = file.getName();
 		

@@ -17,14 +17,14 @@ public interface IEditableCellverseListener {
 	
 	/**
 	 * The controller requests a File to save data to. 
-	 * @param filter to filter files
+	 * @param filters to filter files
 	 * @return Return a valid file, or null on error or user interruption
 	 */
 	public File requestSaveFile(FileFilter... filters);
 
 	/**
 	 * The controller requests a File to load data from. 
-	 * @param filter to filter files
+	 * @param filters to filter files
 	 * @return Return a valid file, or null on error or user interruption
 	 */
 	public File requestOpenFile(FileFilter... filters);
