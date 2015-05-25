@@ -15,13 +15,13 @@ import java.util.BitSet;
  */
 public interface ISimulator {
 	/**
-	 * Setter for rule. 
+	 * Set rule. 
 	 * @param rule Bitset of rules
 	 */
 	public void setRule(BitSet rule);
 	
 	/**
-	 * Getter for rule. 
+	 * Get rule. 
 	 * @return Bitset of rules
 	 */
 	public BitSet getRule();
