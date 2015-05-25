@@ -8,6 +8,9 @@ import java.util.BitSet;
 
 import javax.swing.JFileChooser;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import hu.unideb.inf.elementbound.celldweller.model.CSVAdapter;
 import hu.unideb.inf.elementbound.celldweller.model.Cellverse;
 import hu.unideb.inf.elementbound.celldweller.model.Cellverse.Point;
@@ -20,6 +23,7 @@ public class EditableCellverseController {
 	private ISimulator simulator;
 	private Canvas displayCanvas;
 	private Component viewComponent;
+	private Logger logger;
 	
 	private void sendCellcountNotif() {
 		EditableCellverseView v = (EditableCellverseView)viewComponent;
@@ -61,6 +65,8 @@ public class EditableCellverseController {
 	public void init(Canvas displayCanvas, Component viewComponent) {
 		this.displayCanvas = displayCanvas;
 		this.viewComponent = viewComponent;
+		this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
+		logger.info("Init");
 		
 		cellverse = new Cellverse();
 		cellverse.setCell(new Point(0,0), true);
@@ -75,17 +81,24 @@ public class EditableCellverseController {
 	
 	public void ruleChange(BitSet newRule) {
 		simulator.setRule(newRule);
+		logger.info("Rule change");
 	}
 	
 	public void singleStep() {
+		logger.info("Single step");
+		
 		simulator.step(cellverse);
 		cellverse.swapBuffers();
 		displayCanvas.repaint();
+		
+		logger.info("Cell count: " + cellverse.getAliveCells().size());
 		
 		sendCellcountNotif();
 	}
 	
 	public void clear() {
+		logger.info("Clear");
+		
 		cellverse.clear();
 		cellverse.swapBuffers();
 		displayCanvas.repaint();
@@ -94,34 +107,48 @@ public class EditableCellverseController {
 	}
 	
 	public void saveToFile() {
+		logger.info("Saving to file");
+		logger.info("Prompting user");
+		
 		JFileChooser jfc = new JFileChooser();
 		try {
-			int result = jfc.showSaveDialog(viewComponent);
 			jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			int result = jfc.showSaveDialog(viewComponent);
+			
 			if(result == JFileChooser.APPROVE_OPTION) {
+				logger.info("Selected " + jfc.getSelectedFile().toString());
 				IOAdapter adapter = new CSVAdapter();
 				adapter.Write(jfc.getSelectedFile(), cellverse);
 			}
 		} 
 		catch (HeadlessException | IOException ex) {
-			ex.printStackTrace();
+			logger.error("Exception while saving", ex);
 		}
 	}
 	
 	public void loadFromFile() {
+		logger.info("Loading from file");
+		logger.info("Prompting user");
+		
+		
 		JFileChooser jfc = new JFileChooser();
 		try {
+			jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 			int result = jfc.showOpenDialog(viewComponent);
+			
 			if(result == JFileChooser.APPROVE_OPTION) {
+				logger.info("Selected " + jfc.getSelectedFile().toString());
 				IOAdapter adapter = new CSVAdapter();
 				adapter.Read(jfc.getSelectedFile(), cellverse);
 				displayCanvas.repaint();
+				
+				logger.info("Loaded " + cellverse.getAliveCells().size() + " cell(s)");
 				
 				sendCellcountNotif();
 			}
 		} 
 		catch (HeadlessException | IOException ex) {
-			ex.printStackTrace();
+			logger.error("Exception while loading", ex);
 		}
 	}
 	
