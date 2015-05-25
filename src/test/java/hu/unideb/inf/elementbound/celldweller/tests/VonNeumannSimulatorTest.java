@@ -10,7 +10,7 @@ import java.util.BitSet;
 
 import org.junit.Test;
 
-public class VonNeumannSimulatorTests {
+public class VonNeumannSimulatorTest {
 	@Test
 	public void emptyRuleTest() {
 		BitSet rule = new BitSet();

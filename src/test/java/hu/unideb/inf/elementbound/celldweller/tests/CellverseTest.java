@@ -1,13 +1,12 @@
 package hu.unideb.inf.elementbound.celldweller.tests;
 
 import static org.junit.Assert.*;
-
-import org.junit.Test;
-
 import hu.unideb.inf.elementbound.celldweller.model.Cellverse;
 import hu.unideb.inf.elementbound.celldweller.model.Cellverse.Point;
 
-public class CellverseTests {
+import org.junit.Test;
+
+public class CellverseTest {
 	@Test
 	public void emptyInitializerTest() {
 		Cellverse cellverse = new Cellverse();
