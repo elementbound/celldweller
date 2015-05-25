@@ -29,23 +29,54 @@ import hu.unideb.inf.elementbound.celldweller.view.EditableCellverseView;
  *
  */
 public class EditableCellverseController {
+	/**
+	 * Internal cellverse to perform operations on. 
+	 */
 	private Cellverse cellverse;
+	
+	/**
+	 * Internal simulator to use. 
+	 */
 	private ISimulator simulator;
+	
+	/**
+	 * The view. 
+	 */
 	private IEditableCellverseListener view;
+	
+	/**
+	 * Logger.
+	 */
 	private Logger logger;
 	
+	/**
+	 * Get Internal cellverse.
+	 * @return Internal cellverse
+	 */
 	public Cellverse getCellverse() {
 		return cellverse;
 	}
 
+	/**
+	 * Replace internal cellverse.
+	 * @param cellverse Internal cellverse
+	 */
 	public void setCellverse(Cellverse cellverse) {
 		this.cellverse = cellverse;
 	}
 
+	/**
+	 * Get internal simulator.
+	 * @return Internal simulator
+	 */
 	public ISimulator getSimulator() {
 		return simulator;
 	}
 
+	/**
+	 * Replace internal simulator.
+	 * @param simulator Internal simulator
+	 */
 	public void setSimulator(ISimulator simulator) {
 		this.simulator = simulator;
 	}
