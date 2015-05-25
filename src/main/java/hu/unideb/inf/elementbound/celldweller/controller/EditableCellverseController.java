@@ -25,7 +25,7 @@ import hu.unideb.inf.elementbound.celldweller.view.EditableCellverseView;
  * 
  * The user interface can interact with the controller through its methods. 
  * @see EditableCellverseView
- * @author adminus
+ * @author elementbound
  *
  */
 public class EditableCellverseController {

@@ -315,17 +315,12 @@ public class EditableCellverseView extends JFrame implements IEditableCellverseL
 	}
 
 	@Override
-	public void requestRepaint() {
+	public void cellverseUpdate() {
 		displayCanvas.repaint();
 	}
 
 	@Override
-	public void cellverseUpdate() {
-		requestRepaint();
-	}
-
-	@Override
-	public File requestSaveFile(FileNameExtensionFilter filter) {
+	public File requestSaveFile(FileFilter filter) {
 		JFileChooser jfc = new JFileChooser();
 		try {
 			jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -343,7 +338,7 @@ public class EditableCellverseView extends JFrame implements IEditableCellverseL
 	}
 
 	@Override
-	public File requestOpenFile(FileNameExtensionFilter filter) {
+	public File requestOpenFile(FileFilter filter) {
 		JFileChooser jfc = new JFileChooser();
 		try {
 			jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);

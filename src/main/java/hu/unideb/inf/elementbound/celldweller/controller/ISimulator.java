@@ -11,7 +11,7 @@ import java.util.BitSet;
  * 
  * A bitset can represent arbitrary automata, by giving each situation an ID, and mapping
  * these IDs to a bit, stating the automata's resulting state. 
- * @author adminus
+ * @author elementbound
  */
 public interface ISimulator {
 	/**
