@@ -1,14 +1,10 @@
 package hu.unideb.inf.elementbound.celldweller.controller;
 
-import java.awt.Canvas;
-import java.awt.Component;
-import java.awt.HeadlessException;
 import java.io.File;
 import java.io.IOException;
 import java.util.BitSet;
 import java.util.Random;
 
-import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.slf4j.LoggerFactory;
@@ -18,7 +14,20 @@ import hu.unideb.inf.elementbound.celldweller.model.CSVAdapter;
 import hu.unideb.inf.elementbound.celldweller.model.Cellverse;
 import hu.unideb.inf.elementbound.celldweller.model.Cellverse.Point;
 import hu.unideb.inf.elementbound.celldweller.model.IOAdapter;
+import hu.unideb.inf.elementbound.celldweller.view.EditableCellverseView;
 
+/**
+ * Controller for cellverse editor. 
+ * The editor maintains a cellverse and a simulator. Communication towards the user is solved via 
+ * an instance that implements IEditableCellverseListener. This interface is used to notify the
+ * user interface about the cellvere's state changes, and is used to request UI-specific 
+ * behaviour, like prompting the user for a file to save the cellverse's state. 
+ * 
+ * The user interface can interact with the controller through its methods. 
+ * @see EditableCellverseView
+ * @author adminus
+ *
+ */
 public class EditableCellverseController {
 	private Cellverse cellverse;
 	private ISimulator simulator;
@@ -41,6 +50,12 @@ public class EditableCellverseController {
 		this.simulator = simulator;
 	}
 
+	/**
+	 * Init the editor. 
+	 * A new cellverse and simulator is created. 
+	 * The simulator is assigned a default always-live rule.
+	 * @param view User interface component to communicate with
+	 */
 	public void init(IEditableCellverseListener view) {
 		this.view = view;
 		this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
@@ -57,11 +72,19 @@ public class EditableCellverseController {
 		simulator.setRule(rule);
 	}
 	
+	/**
+	 * Change the simulator's rule. 
+	 * @param newRule The new rule to be used. 
+	 */
 	public void ruleChange(BitSet newRule) {
 		simulator.setRule(newRule);
 		logger.info("Rule change: " + (new String(newRule.toByteArray())));
 	}
 	
+	/**
+	 * Generate a new, random rule. 
+	 * requestRuleUpdate() is called on the view, with the new random rule
+	 */
 	public void randomizeRule() {
 		BitSet rule = new BitSet();
 		Random rng = new Random();
@@ -75,6 +98,10 @@ public class EditableCellverseController {
 		view.requestRuleUpdate(rule);
 	}
 	
+	/**
+	 * Request a single step of simulation.
+	 * cellverseUpdate() is called on the view, since the cellverse is modified. 
+	 */
 	public void singleStep() {
 		logger.info("Single step");
 		
@@ -85,6 +112,10 @@ public class EditableCellverseController {
 		view.cellverseUpdate();
 	}
 	
+	/**
+	 * Request a cellverse clear. 
+	 * cellverseUpdate() is called on the view, since the cellverse is modified. 
+	 */
 	public void clear() {
 		logger.info("Clear");
 		
@@ -94,6 +125,10 @@ public class EditableCellverseController {
 		view.cellverseUpdate();
 	}
 	
+	/**
+	 * Save the current cellverse to a file. 
+	 * File path and format is determined using the view's functions. 
+	 */
 	public void saveToFile() {
 		logger.info("Saving to file");
 		logger.info("Prompting user");
@@ -111,6 +146,10 @@ public class EditableCellverseController {
 		}
 	}
 	
+	/**
+	 * Load cellverse from a file. 
+	 * File path and format is determined using the view's functions. 
+	 */
 	public void loadFromFile() {
 		logger.info("Loading from file");
 		logger.info("Prompting user");
@@ -129,6 +168,11 @@ public class EditableCellverseController {
 		}
 	}
 	
+	/**
+	 * Set cell, aka. set it to alive
+	 * @param cellX x coordinate of the cell
+	 * @param cellY y coordinate of the cell
+	 */
 	public void setCell(int cellX, int cellY) {
 		Point cell = new Point(cellX, cellY);
 		cellverse.setCell(cell, true);
