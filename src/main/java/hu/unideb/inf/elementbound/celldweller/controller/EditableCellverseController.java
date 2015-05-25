@@ -3,10 +3,13 @@ package hu.unideb.inf.elementbound.celldweller.controller;
 import java.awt.Canvas;
 import java.awt.Component;
 import java.awt.HeadlessException;
+import java.io.File;
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.Random;
 
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -15,20 +18,12 @@ import hu.unideb.inf.elementbound.celldweller.model.CSVAdapter;
 import hu.unideb.inf.elementbound.celldweller.model.Cellverse;
 import hu.unideb.inf.elementbound.celldweller.model.Cellverse.Point;
 import hu.unideb.inf.elementbound.celldweller.model.IOAdapter;
-import hu.unideb.inf.elementbound.celldweller.view.CellverseDisplay;
-import hu.unideb.inf.elementbound.celldweller.view.EditableCellverseView;
 
 public class EditableCellverseController {
 	private Cellverse cellverse;
 	private ISimulator simulator;
-	private Canvas displayCanvas;
-	private Component viewComponent;
+	private IEditableCellverseListener view;
 	private Logger logger;
-	
-	private void sendCellcountNotif() {
-		EditableCellverseView v = (EditableCellverseView)viewComponent;
-		v.notifyCellcount();
-	}
 	
 	public Cellverse getCellverse() {
 		return cellverse;
@@ -46,25 +41,8 @@ public class EditableCellverseController {
 		this.simulator = simulator;
 	}
 
-	public Canvas getDisplayCanvas() {
-		return displayCanvas;
-	}
-
-	public void setDisplayCanvas(Canvas displayCanvas) {
-		this.displayCanvas = displayCanvas;
-	}
-
-	public Component getViewComponent() {
-		return viewComponent;
-	}
-
-	public void setViewComponent(Component viewComponent) {
-		this.viewComponent = viewComponent;
-	}
-
-	public void init(Canvas displayCanvas, Component viewComponent) {
-		this.displayCanvas = displayCanvas;
-		this.viewComponent = viewComponent;
+	public void init(IEditableCellverseListener view) {
+		this.view = view;
 		this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 		logger.info("Init");
 		
@@ -81,7 +59,20 @@ public class EditableCellverseController {
 	
 	public void ruleChange(BitSet newRule) {
 		simulator.setRule(newRule);
-		logger.info("Rule change");
+		logger.info("Rule change: " + (new String(newRule.toByteArray())));
+	}
+	
+	public void randomizeRule() {
+		BitSet rule = new BitSet();
+		Random rng = new Random();
+		
+		for(int i = 0; i < 32; i++)
+			rule.set(i, rng.nextBoolean());
+		
+		simulator.setRule(rule);
+		
+		logger.info("Randomgenerated rule: " + (new String(rule.toByteArray())));
+		view.requestRuleUpdate(rule);
 	}
 	
 	public void singleStep() {
@@ -89,11 +80,9 @@ public class EditableCellverseController {
 		
 		simulator.step(cellverse);
 		cellverse.swapBuffers();
-		displayCanvas.repaint();
-		
 		logger.info("Cell count: " + cellverse.getAliveCells().size());
 		
-		sendCellcountNotif();
+		view.cellverseUpdate();
 	}
 	
 	public void clear() {
@@ -101,28 +90,24 @@ public class EditableCellverseController {
 		
 		cellverse.clear();
 		cellverse.swapBuffers();
-		displayCanvas.repaint();
-		
-		sendCellcountNotif();
+
+		view.cellverseUpdate();
 	}
 	
 	public void saveToFile() {
 		logger.info("Saving to file");
 		logger.info("Prompting user");
 		
-		JFileChooser jfc = new JFileChooser();
-		try {
-			jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			int result = jfc.showSaveDialog(viewComponent);
-			
-			if(result == JFileChooser.APPROVE_OPTION) {
-				logger.info("Selected " + jfc.getSelectedFile().toString());
-				IOAdapter adapter = new CSVAdapter();
-				adapter.Write(jfc.getSelectedFile(), cellverse);
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Comma separated values (CSV)", "csv");
+		File fout = view.requestSaveFile(filter);
+		if(fout != null) {
+			logger.info("Saving to " + fout.toString());
+			IOAdapter adapter = new CSVAdapter();
+			try {
+				adapter.Write(fout, cellverse);
+			} catch (IOException e) {
+				logger.error("Failed save", e);
 			}
-		} 
-		catch (HeadlessException | IOException ex) {
-			logger.error("Exception while saving", ex);
 		}
 	}
 	
@@ -130,46 +115,25 @@ public class EditableCellverseController {
 		logger.info("Loading from file");
 		logger.info("Prompting user");
 		
-		
-		JFileChooser jfc = new JFileChooser();
-		try {
-			jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			int result = jfc.showOpenDialog(viewComponent);
-			
-			if(result == JFileChooser.APPROVE_OPTION) {
-				logger.info("Selected " + jfc.getSelectedFile().toString());
-				IOAdapter adapter = new CSVAdapter();
-				adapter.Read(jfc.getSelectedFile(), cellverse);
-				displayCanvas.repaint();
-				
-				logger.info("Loaded " + cellverse.getAliveCells().size() + " cell(s)");
-				
-				sendCellcountNotif();
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Comma separated values (CSV)", "csv");
+		File fin= view.requestOpenFile(filter);
+		if(fin != null) {
+			logger.info("Loading from " + fin.toString());
+			IOAdapter adapter = new CSVAdapter();
+			try {
+				adapter.Read(fin, cellverse);
+				view.cellverseUpdate();
+			} catch (IOException e) {
+				logger.error("Failed load", e);
 			}
-		} 
-		catch (HeadlessException | IOException ex) {
-			logger.error("Exception while loading", ex);
 		}
 	}
 	
-	public void setCell(double cellX, double cellY) {
-		CellverseDisplay d = (CellverseDisplay)displayCanvas;
-		
-		cellX -= d.getWidth()/2;
-		cellY -= d.getHeight()/2;
-		
-		cellX /= d.zoom;
-		cellY /= d.zoom;
-		
-		cellX -= d.originX;
-		cellY -= d.originY;
-		
-		Point cell = new Point((int)cellX, (int)cellY);
+	public void setCell(int cellX, int cellY) {
+		Point cell = new Point(cellX, cellY);
 		cellverse.setCell(cell, true);
 		
 		cellverse.swapBuffers();
-		d.repaint();
-		
-		sendCellcountNotif();
+		view.cellverseUpdate();
 	}
 }

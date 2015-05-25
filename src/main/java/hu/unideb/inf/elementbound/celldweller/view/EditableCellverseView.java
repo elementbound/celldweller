@@ -1,6 +1,7 @@
 package hu.unideb.inf.elementbound.celldweller.view;
 
 import hu.unideb.inf.elementbound.celldweller.controller.EditableCellverseController;
+import hu.unideb.inf.elementbound.celldweller.controller.IEditableCellverseListener;
 import hu.unideb.inf.elementbound.celldweller.controller.ISimulator;
 import hu.unideb.inf.elementbound.celldweller.controller.VonNeumannSimulator;
 import hu.unideb.inf.elementbound.celldweller.model.CSVAdapter;
@@ -48,10 +49,12 @@ import java.awt.FlowLayout;
 
 import javax.swing.Box;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JSeparator;
 
-public class EditableCellverseView extends JFrame {
+public class EditableCellverseView extends JFrame implements IEditableCellverseListener {
 	private JTextField textFieldRule;
 	private Canvas displayCanvas;
 	private JLabel lblStats;
@@ -94,9 +97,9 @@ public class EditableCellverseView extends JFrame {
 		getContentPane().add(settingsPanel, BorderLayout.EAST);
 		GridBagLayout gbl_settingsPanel = new GridBagLayout();
 		gbl_settingsPanel.columnWidths = new int[]{129, 0};
-		gbl_settingsPanel.rowHeights = new int[] {32, 32, 32, 32, 32, 0, 0, 0};
+		gbl_settingsPanel.rowHeights = new int[] {32, 32, 32, 32, 32, 0, 0, 0, 0};
 		gbl_settingsPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
-		gbl_settingsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
+		gbl_settingsPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
 		settingsPanel.setLayout(gbl_settingsPanel);
 		
 		JPanel rulePanel = new JPanel();
@@ -122,6 +125,14 @@ public class EditableCellverseView extends JFrame {
 		});
 		textFieldRule.setColumns(10);
 		rulePanel.add(textFieldRule);
+		
+		JButton btnRandomRule = new JButton("Random");
+		btnRandomRule.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				controller.randomizeRule();
+			}
+		});
+		rulePanel.add(btnRandomRule);
 		
 		JButton btnStep = new JButton("Step");
 		btnStep.addActionListener(new ActionListener() {
@@ -186,7 +197,11 @@ public class EditableCellverseView extends JFrame {
 		settingsPanel.add(lblFileFormat, gbc_lblFileFormat);
 		
 		JComboBox cboxFileFormat = new JComboBox();
-		cboxFileFormat.setModel(new DefaultComboBoxModel(new String[] {"Comma Separated Values (CSV)", "Extensible Markup Language (XML)"}));
+		cboxFileFormat.setModel(new DefaultComboBoxModel(
+				new String[] {
+						"Comma Separated Values (CSV)" 
+						//"Extensible Markup Language (XML)"
+				}));
 		GridBagConstraints gbc_cboxFileFormat = new GridBagConstraints();
 		gbc_cboxFileFormat.insets = new Insets(0, 0, 5, 0);
 		gbc_cboxFileFormat.fill = GridBagConstraints.HORIZONTAL;
@@ -212,8 +227,23 @@ public class EditableCellverseView extends JFrame {
 		displayCanvas.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if(e.getButton() == MouseEvent.BUTTON1)
-					controller.setCell(e.getX(), e.getY());
+				if(e.getButton() == MouseEvent.BUTTON1) {
+					double cellX, cellY;
+					CellverseDisplay d = (CellverseDisplay)displayCanvas;
+					cellX = e.getX();
+					cellY = e.getY();
+					
+					cellX -= d.getWidth()/2;
+					cellY -= d.getHeight()/2;
+					
+					cellX /= d.zoom;
+					cellY /= d.zoom;
+					
+					cellX -= d.originX;
+					cellY -= d.originY;
+					
+					controller.setCell((int)cellX, (int)cellY);
+				}
 			}
 		});
 		
@@ -266,7 +296,7 @@ public class EditableCellverseView extends JFrame {
 		//
 
 		controller = new EditableCellverseController();
-		controller.init(displayCanvas, this);
+		controller.init(this);
 		
 		((CellverseDisplay)displayCanvas).setCellverse(controller.getCellverse());
 	}
@@ -283,4 +313,57 @@ public class EditableCellverseView extends JFrame {
 		lblStats.setText("Cells alive: " + controller.getCellverse().getAliveCells().size() + " | " + 
 						 "Zoom: " + ((CellverseDisplay)displayCanvas).zoom);
 	}
+
+	@Override
+	public void requestRepaint() {
+		displayCanvas.repaint();
+	}
+
+	@Override
+	public void cellverseUpdate() {
+		requestRepaint();
+	}
+
+	@Override
+	public File requestSaveFile(FileNameExtensionFilter filter) {
+		JFileChooser jfc = new JFileChooser();
+		try {
+			jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			jfc.setFileFilter(filter);
+			int result = jfc.showSaveDialog(this);
+			
+			if(result == JFileChooser.APPROVE_OPTION)
+				return jfc.getSelectedFile();
+			else
+				return null;
+		} 
+		catch (HeadlessException ex) {
+			return null;
+		}
+	}
+
+	@Override
+	public File requestOpenFile(FileNameExtensionFilter filter) {
+		JFileChooser jfc = new JFileChooser();
+		try {
+			jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			jfc.setFileFilter(filter);
+			int result = jfc.showOpenDialog(this);
+			
+			if(result == JFileChooser.APPROVE_OPTION)
+				return jfc.getSelectedFile();
+			else
+				return null;
+		} 
+		catch (HeadlessException ex) {
+			return null;
+		}
+	}
+
+	@Override
+	public void requestRuleUpdate(BitSet rule) {
+		textFieldRule.setText(new String(rule.toByteArray()));
+	}
+	
+	
 }
