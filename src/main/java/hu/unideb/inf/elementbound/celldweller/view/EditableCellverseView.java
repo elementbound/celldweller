@@ -43,6 +43,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.SwingConstants;
 
@@ -55,11 +57,70 @@ import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JSeparator;
 
+import java.awt.event.MouseMotionAdapter;
+
 public class EditableCellverseView extends JFrame implements IEditableCellverseListener {
 	private JTextField textFieldRule;
 	private Canvas displayCanvas;
 	private JLabel lblStats;
 	private EditableCellverseController controller;
+	
+	private class DrawListener implements MouseListener, MouseMotionListener {
+		private boolean active = false;
+		
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			if(active) {
+				double cellX, cellY;
+				CellverseDisplay d = (CellverseDisplay)displayCanvas;
+				cellX = e.getX();
+				cellY = e.getY();
+				
+				cellX -= d.getWidth()/2;
+				cellY -= d.getHeight()/2;
+				
+				cellX /= d.zoom;
+				cellY /= d.zoom;
+				
+				cellX += d.originX;
+				cellY += d.originY;
+				
+				controller.setCell((int)cellX, (int)cellY);
+			}
+		}
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
+			;
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			;
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			active = e.getButton() == MouseEvent.BUTTON1;
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			active = false;
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+	}
 
 	/**
 	 * Launch the application.
@@ -212,28 +273,10 @@ public class EditableCellverseView extends JFrame implements IEditableCellverseL
 		thingsPanel.add(lblStats);
 		
 		displayCanvas = new CellverseDisplay();
-		displayCanvas.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if(e.getButton() == MouseEvent.BUTTON1) {
-					double cellX, cellY;
-					CellverseDisplay d = (CellverseDisplay)displayCanvas;
-					cellX = e.getX();
-					cellY = e.getY();
-					
-					cellX -= d.getWidth()/2;
-					cellY -= d.getHeight()/2;
-					
-					cellX /= d.zoom;
-					cellY /= d.zoom;
-					
-					cellX += d.originX;
-					cellY += d.originY;
-					
-					controller.setCell((int)cellX, (int)cellY);
-				}
-			}
-		});
+		
+		DrawListener drawListener = new DrawListener();
+		displayCanvas.addMouseListener(drawListener);
+		displayCanvas.addMouseMotionListener(drawListener);
 		
 		displayCanvas.addKeyListener(new KeyAdapter() {
 			@Override
