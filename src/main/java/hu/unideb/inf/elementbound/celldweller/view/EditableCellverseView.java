@@ -227,8 +227,8 @@ public class EditableCellverseView extends JFrame implements IEditableCellverseL
 					cellX /= d.zoom;
 					cellY /= d.zoom;
 					
-					cellX -= d.originX;
-					cellY -= d.originY;
+					cellX += d.originX;
+					cellY += d.originY;
 					
 					controller.setCell((int)cellX, (int)cellY);
 				}
